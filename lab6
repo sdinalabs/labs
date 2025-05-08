@@ -1,0 +1,77 @@
+import timeit
+import matplotlib.pyplot as plt
+
+# Рекурсивная функция
+def F_recursive(n):
+    if n < 2: return 5
+    if n > 17: return (1 if n % 2 == 0 else -1) * (F_recursive(n - 1) - (n - 2))
+    factorial = 1
+    for i in range(1, 2 * n + 1):
+        factorial *= i
+    return (((n - 2) / factorial) - F_recursive(n - 1))
+
+# Итеративная функция
+def F_iterative(n):
+    if n < 2: return 5
+    result = 5
+
+    if n >= 2:
+        fact = 1
+        for i in range(1, 5): fact *= i  # 4! = 24
+
+        for i in range(2, min(n, 17) + 1):
+            if i == 2:
+                result = (i - 2) / fact - result
+            else:
+                fact *= (2 * i - 1) * (2 * i)
+                result = (i - 2) / fact - result
+
+    for i in range(18, n + 1):
+        result = (1 if i % 2 == 0 else -1) * (result - (i - 2))
+
+    return result
+
+def measure_time(func, n):
+    try:
+        timer = timeit.Timer(lambda: func(n))
+        time = timer.timeit(number=1000) / 1000  # Среднее время за 1000 вызовов
+        return func(n), time
+    except RecursionError:
+        return "RecursionError", None
+
+def run_comparison():
+    print("\nСравнительная таблица:")
+    print("-" * 70)
+    print(f"{'n':<5} | {'Рекурсия':<20} | {'Итерация':<20} | {'Время рекурсии':<15} | {'Время итерации':<15}")
+    print("-" * 70)
+
+    rec_times, iter_times = [], []
+    valid_n = []
+
+    for n in range(1, 21):
+        rec_val, rec_time = measure_time(F_recursive, n)
+        iter_val, iter_time = measure_time(F_iterative, n)
+
+        rec_time_str = f"{rec_time:.6f}" if rec_time is not None else "Ошибка"
+        iter_time_str = f"{iter_time:.6f}"
+
+        print(f"{n:<5} | {rec_val:<20} | {iter_val:<20} | {rec_time_str:<15} | {iter_time_str:<15}")
+
+        if rec_time is not None:
+            rec_times.append(rec_time)
+            iter_times.append(iter_time)
+            valid_n.append(n)
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(valid_n, rec_times, label='Рекурсия', marker='o')
+    plt.plot(valid_n, iter_times, label='Итерация', marker='s')
+    plt.xlabel('n')
+    plt.ylabel('Время (секунды)')
+    plt.title('Сравнение времени выполнения')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+if __name__ == "__main__":
+    run_comparison()
