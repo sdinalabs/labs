@@ -1,0 +1,112 @@
+import tkinter as tk
+from tkinter import scrolledtext
+from itertools import permutations
+import time
+
+# Алгоритмический подход
+def generate_permutations(N, K):
+    def backtrack(start, path):
+        if len(path) == K:
+            permutations.append(path.copy())
+            return
+        for i in range(0, N, 2):
+            if i not in path:
+                path.append(i)
+                backtrack(i + 1, path)
+                path.pop()
+
+    permutations = []
+    backtrack(0, [])
+    return permutations
+
+def generate_seating_a(N, K):
+    result = []
+    count = 0
+
+    permutations = generate_permutations(N, K)
+
+    # Создание рассадки для каждой перестановки
+    for positions in permutations:
+        seating = [0] * N
+        for i in range(len(positions)):
+            pos = positions[i]
+            seating[pos] = i + 1
+        result.append(seating)
+        count += 1  # Увеличиваем счетчик
+
+    return result, count
+
+# Использование функций Python (itertools)
+def generate_seating_i(N, K):
+    result = []
+    count = 0
+    for positions in permutations(range(N), K):
+        seating = [0] * N
+        for idx, pos in enumerate(positions):
+            seating[pos] = idx + 1
+        result.append(seating)
+        count += 1
+    return result, count
+
+# Функция для обработки нажатия кнопки
+def calculate_and_display():
+    try:
+        # Получение значений из полей ввода
+        N = int(entry_N.get())
+        K = int(entry_K.get())
+
+        # Очистка текстового поля
+        output_text.delete(1.0, tk.END)
+
+        # Выполнение алгоритмического подхода
+        start_time = time.time()
+        seating_algorithmic, count_algorithmic = generate_seating_a(N, K)
+        algorithmic_time = time.time() - start_time
+
+        # Выполнение подхода с использованием itertools
+        start_time = time.time()
+        seating_itertools, count_itertools = generate_seating_i(N, K)
+        itertools_time = time.time() - start_time
+
+        # Вывод результатов в текстовое поле
+        output_text.insert(tk.END, "Алгоритмический подход:\n")
+        for s in seating_algorithmic:
+            output_text.insert(tk.END, f"{s}\n")
+        output_text.insert(tk.END, f"Количество комбинаций: {count_algorithmic}\n")
+        output_text.insert(tk.END, f"Время выполнения: {algorithmic_time:.6f} секунд\n\n")
+
+        output_text.insert(tk.END, "Подход с использованием itertools:\n")
+        for s in seating_itertools:
+            output_text.insert(tk.END, f"{s}\n")
+        output_text.insert(tk.END, f"Количество комбинаций: {count_itertools}\n")
+        output_text.insert(tk.END, f"Время выполнения: {itertools_time:.6f} секунд\n")
+    except ValueError:
+        output_text.delete(1.0, tk.END)
+        output_text.insert(tk.END, "Ошибка: Введите корректные числа для N и K.")
+
+# Создание главного окна
+root = tk.Tk()
+root.title("Генератор рассадки")
+
+# Метка и поле ввода для N
+label_N = tk.Label(root, text="Количество вагонов (N):")
+label_N.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+entry_N = tk.Entry(root)
+entry_N.grid(row=0, column=1, padx=10, pady=5)
+
+# Метка и поле ввода для K
+label_K = tk.Label(root, text="Количество человек (K):")
+label_K.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+entry_K = tk.Entry(root)
+entry_K.grid(row=1, column=1, padx=10, pady=5)
+
+# Кнопка для запуска расчета
+calculate_button = tk.Button(root, text="Рассчитать", command=calculate_and_display)
+calculate_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+# Текстовое поле для вывода результатов с прокруткой
+output_text = scrolledtext.ScrolledText(root, width=60, height=20, wrap=tk.WORD)
+output_text.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
+
+# Запуск главного цикла
+root.mainloop()
