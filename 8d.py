@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import csv
 from collections import defaultdict
-import math
 
 
 class Contract:
@@ -133,3 +132,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = DrivingSchoolApp(root)
     root.mainloop()
+
