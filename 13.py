@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-# Чтение матрицы из файла
 def read_matrix(filename):
     matrix = []
     with open(filename, 'r') as file:
@@ -8,12 +7,10 @@ def read_matrix(filename):
             row = [int(x) for x in line.strip().split()]
             matrix.append(row)
     return matrix
-# Поиск выхода из лабиринта
 def find_path(matrix, start, end):
     rows, cols = len(matrix), len(matrix[0])
-    visited = [[False for _ in range(cols)] for _ in range(rows)]
+    visited = [[False for z in range(cols)] for z in range(rows)]
     path = []
-    
     def dfs(x, y):
         if x < 0 or x >= rows or y < 0 or y >= cols:
             return False
@@ -24,8 +21,7 @@ def find_path(matrix, start, end):
             return True
         visited[x][y] = True
         path.append((x, y))
-        # Проверяем все возможные направления
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # вправо, вниз, влево, вверх
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         for dx, dy in directions:
             if dfs(x + dx, y + dy):
                 return True
@@ -44,7 +40,6 @@ def visualize_labyrinth(matrix, path, start, end):
     
     canvas = tk.Canvas(visualization_window, width=canvas_width, height=canvas_height, bg='white')
     canvas.pack(padx=10, pady=10)
-    # Отрисовка лабиринта
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
             x1, y1 = j * cell_size, i * cell_size
@@ -54,8 +49,6 @@ def visualize_labyrinth(matrix, path, start, end):
                 canvas.create_rectangle(x1, y1, x2, y2, fill='black', outline='gray')
             else:
                 canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='gray')
-    
-    # Отрисовка пути
     if path:
         for idx, (i, j) in enumerate(path):
             x1, y1 = j * cell_size, i * cell_size
@@ -86,24 +79,20 @@ def select_file():
     if filename:
         file_label.config(text=f"Выбран файл: {filename.split('/')[-1]}")
         solve_labyrinth(filename)
-# Решение лабиринта
 def solve_labyrinth(filename):
     try:
         matrix = read_matrix(filename)
         if len(matrix) != 15 or any(len(row) != 15 for row in matrix):
             messagebox.showerror("Ошибка", "Матрица должна быть размером 15x15")
             return
-        # Находим стартовую позицию 
         start = (0, 0)
         if matrix[start[0]][start[1]] == 1:
             messagebox.showerror("Ошибка", "Стартовая позиция заблокирована")
             return
-        # Находим конечную позицию 
         end = (14, 14)
         if matrix[end[0]][end[1]] == 1:
             messagebox.showerror("Ошибка", "Конечная позиция заблокирована")
             return
-        # Ищем путь
         path = find_path(matrix, start, end)
         if path:
             messagebox.showinfo("Успех", f"Путь найден! Длина пути: {len(path)} шагов")
@@ -136,12 +125,11 @@ def create_main_window():
     
     exit_button = tk.Button(root, text="Выход", command=root.quit, 
                            font=("Arial", 10), bg="#f44336", fg="white", padx=15, pady=5)
-    exit_button.pack(pady=10)
-    
+    exit_button.pack(pady=10) 
     return root
-
 def main():
     root = create_main_window()
     root.mainloop()
 if __name__ == "__main__":
     main()
+
